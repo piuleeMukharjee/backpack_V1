@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:6
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/genie
+      - JWT_SECRET=change_this_secret
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend/uploads:/app/uploads
+    depends_on:
+      - mongo
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+volumes:
+  mongo-data:
